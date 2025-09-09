@@ -1,0 +1,5 @@
+# Archivos sensibles
+.env
+*.pyc
+__pycache__/
+data/
