@@ -79,52 +79,77 @@ python main.py
 A continuación, se listan los comandos Docker más importantes usados en
 el proyecto:
 
-## Construcción de imágenes
+1.  **Construir y administrar imágenes:**
 
-``` {.bash language="bash"}
-docker build -t etl_app .
-        docker build --no-cache -t etl_app .
-```
+    -   `docker build -t etl_app .`
 
-## Listar imágenes y contenedores
+    -   `docker images`
 
-``` {.bash language="bash"}
-docker images
-        docker ps
-        docker ps -a
-```
+2.  **Contenedores: crear, ejecutar, detener:**
 
-## Ejecutar contenedores
+    -   `docker-compose up -d`
 
-``` {.bash language="bash"}
-docker run -d --name etl_app etl_app
-        docker run -it etl_app /bin/bash
-        docker run -p 8080:8080 etl_app
-        docker run -v /host/path:/container/path etl_app
-```
+    -   `docker-compose up -d etl_app`
 
-## Detener y eliminar contenedores
+    -   `docker-compose down`
 
-``` {.bash language="bash"}
-docker stop etl_app
-        docker rm etl_app
-        docker rm -f etl_app
-```
+    -   `docker stop etl_app`
 
-## Logs y acceso
+    -   `docker start etl_app`
 
-``` {.bash language="bash"}
-docker logs -f etl_app
-        docker exec -it etl_app /bin/bash
-```
+    -   `docker restart etl_app`
 
-## Docker Compose
+    -   `docker rm etl_app`
 
-``` {.bash language="bash"}
-docker-compose up -d
-        docker-compose down
-        docker-compose logs -f
-```
+    -   `docker rmi etl_app`
+
+3.  **Acceder a contenedores:**
+
+    -   `docker exec -it etl_app bash`
+
+    -   `docker exec -it etl_app python3 main.py`
+
+4.  **Ver estado y logs:**
+
+    -   `docker ps`
+
+    -   `docker ps -a`
+
+    -   `docker logs etl_app`
+
+    -   `docker logs <CONTAINER_ID>`
+
+5.  **Redes y volúmenes:**
+
+    -   `docker network ls`
+
+    -   `docker volume ls`
+
+    -   `docker volume create etl_framewoks_db_data`
+
+    -   `docker inspect etl_postgres_db`
+
+6.  **Limpieza y resolución de conflictos:**
+
+    -   `docker-compose up –remove-orphans`
+
+    -   `docker rm -f etl_postgres_db`
+
+    -   `docker rm -f etl_app`
+
+    -   `docker container prune`
+
+    -   `docker image prune -a`
+
+7.  **Troubleshooting HDFS / Spark / Java:**
+
+    -   `which hdfs`
+
+    -   `hdfs version`
+
+    -   `echo $HADOOP_HOME`
+
+    -   `echo $JAVA_HOME`
 
 # Prompts de ChatGPT más importantes
 
