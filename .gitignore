@@ -2,6 +2,10 @@
 .env
 *.pyc
 __pycache__/
-data/
+
 docker-compose.yml
 Dockerfile
+
+#data
+clean_lung_cancer_backup.csv
+clean_lung_cancer.parquet

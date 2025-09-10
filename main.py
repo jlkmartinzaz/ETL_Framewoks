@@ -1,33 +1,42 @@
-from config.config import CSV_INPUT, PARQUET_OUTPUT, CSV_BACKUP, HDFS_PATH, DB_USER, DB_PASSWORD, DB_HOST, DB_PORT, DB_NAME
-from extract.extractor import create_spark_session, extract_data
+# main.py
+from pyspark.sql import SparkSession
+from extract.extractor import extract_data
 from transform.transformer import transform_data
-from load.loader import save_backup, save_to_hdfs, save_to_postgres
+from load.loader import save_backup, save_to_postgres
+from config.config import get_spark_session, CLEAN_CSV
 
 def main():
+    spark = None
     try:
-        spark = create_spark_session()
+        # Crear sesión Spark
+        spark = get_spark_session()
 
+        #Extracción
         print("1. Extrayendo datos...")
-        df_raw = extract_data(spark, CSV_INPUT)
+        df_raw = extract_data(spark, CLEAN_CSV)
+        print(f"Datos extraídos: {df_raw.count()} filas, {len(df_raw.columns)} columnas")
 
+        #Transformación
         print("2. Transformando datos...")
         df_clean = transform_data(df_raw)
+        print(f"Datos transformados: {df_clean.count()} filas, {len(df_clean.columns)} columnas")
 
-        print("3. Guardando backups...")
-        save_backup(df_clean, PARQUET_OUTPUT, CSV_BACKUP)
+        #Guardar backup local
+        print("3. Guardando backup local...")
+        save_backup(df_clean)
 
-        print("4. Guardando en HDFS...")
-        save_to_hdfs(df_clean, HDFS_PATH)
+        #Guardar en PostgreSQL
+        print("4. Cargando a PostgreSQL...")
+        save_to_postgres(df_clean)
 
-        print("5. Cargando a PostgreSQL...")
-        save_to_postgres(df_clean, DB_USER, DB_PASSWORD, DB_HOST, DB_PORT, DB_NAME)
+        print("ETL completo")
 
     except Exception as e:
         print(f"Error en ETL: {e}")
-
     finally:
-        spark.stop()
-        print("ETL completo")
+        if spark:
+            spark.stop()
+
 
 if __name__ == "__main__":
     main()

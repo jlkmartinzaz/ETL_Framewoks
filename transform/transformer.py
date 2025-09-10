@@ -1,12 +1,18 @@
-from pyspark.sql.functions import col, trim
+from pyspark.sql import DataFrame
+from pyspark.sql.functions import col, when
 
-def transform_data(df):
+def transform_data(df: DataFrame) -> DataFrame:
     try:
-        for c in df.columns:
-            df = df.withColumn(c, trim(col(c)))
-        df = df.withColumn("age", col("age").cast("integer"))
-        df = df.withColumn("pack_years", col("pack_years").cast("double"))
-        return df
+        # Limpieza básica: rellenar valores nulos
+        df_clean = df.fillna({
+            "age": 0,
+            "pack_years": 0,
+            "lung_cancer": 0
+        })
+
+        if "gender" in df_clean.columns:
+            df_clean = df_clean.withColumn("gender", col("gender").cast("string"))
+        return df_clean
     except Exception as e:
         print(f"Error transformando datos: {e}")
         raise
