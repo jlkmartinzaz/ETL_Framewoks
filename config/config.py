@@ -14,20 +14,20 @@ BACKUP_CSV = os.getenv("BACKUP_CSV", "data/clean_lung_cancer_backup.csv")
 
 
 # PostgreSQL
-DB_USER = os.getenv("DB_USER", "etl_user")
-DB_PASSWORD = os.getenv("DB_PASSWORD", "etl_password")
-DB_HOST = os.getenv("DB_HOST", "db")
-DB_PORT = os.getenv("DB_PORT", "5432")
-DB_NAME = os.getenv("DB_NAME", "lungdb")
+DB_USER = os.getenv("DB_USER")
+DB_PASSWORD = os.getenv("DB_PASSWORD")
+DB_HOST = os.getenv("DB_HOST")
+DB_PORT = os.getenv("DB_PORT")
+DB_NAME = os.getenv("DB_NAME")
 
 # Construir URL de conexión SQLAlchemy
 DB_URL = f"postgresql+psycopg2://{DB_USER}:{DB_PASSWORD}@{DB_HOST}:{DB_PORT}/{DB_NAME}"
 
 
 # HDFS
-HDFS_HOST = os.getenv("HDFS_HOST", "hadoop_namenode")  # nombre del servicio en docker-compose
-HDFS_PORT = os.getenv("HDFS_PORT", "9000")
-HDFS_DIR = os.getenv("HDFS_DIR", "/lung_cancer")
+HDFS_HOST = os.getenv("HDFS_HOST")  # nombre del servicio en docker-compose
+HDFS_PORT = os.getenv("HDFS_PORT")
+HDFS_DIR = os.getenv("HDFS_DIR")
 
 HDFS_URL = f"hdfs://{HDFS_HOST}:{HDFS_PORT}{HDFS_DIR}"
 
