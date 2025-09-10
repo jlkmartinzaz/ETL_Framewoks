@@ -1,40 +1,36 @@
-import pandas as pd
+from pyspark.sql.functions import col
 from sqlalchemy import create_engine
-from sqlalchemy.exc import SQLAlchemyError
-from config.config import DB_URL, HDFS_URL
+import pandas as pd
 
-# ---- Guardar en local ----
-def save_to_csv(df, path: str):
-    df.write.mode("overwrite").option("header", True).csv(path)
-    print(f"✅ Guardado CSV local: {path}")
-
-def save_to_parquet(df, path: str):
-    df.write.mode("overwrite").parquet(path)
-    print(f"✅ Guardado Parquet local: {path}")
-
-# ---- Guardar en HDFS ----
-def save_to_hdfs(df, path: str, fmt: str = "parquet"):
-    full_path = f"{HDFS_URL}/{path}"
+def save_backup(df, parquet_path, csv_path):
     try:
-        if fmt == "parquet":
-            df.write.mode("overwrite").parquet(full_path)
-        elif fmt == "csv":
-            df.write.mode("overwrite").option("header", True).csv(full_path)
-        else:
-            raise ValueError("Formato no soportado")
-        print(f"✅ Guardado en HDFS: {full_path}")
+        df.write.mode("overwrite").parquet(parquet_path)
+        df.write.mode("overwrite").option("header", True).csv(csv_path)
+        print(f"Backup guardado en {parquet_path} y {csv_path}")
     except Exception as e:
-        print(f"❌ Error guardando en HDFS: {e}")
+        print(f"Error guardando backup: {e}")
+        raise
 
-# ---- Guardar en Base de Datos ----
-def save_to_sql(df, table_name: str):
+def save_to_hdfs(df, hdfs_path):
     try:
-        pdf = df.toPandas()  # convertir a pandas (solo datasets manejables)
-        engine = create_engine(DB_URL)
-        with engine.begin() as conn:
-            pdf.to_sql(table_name, con=conn, if_exists="replace", index=False)
-        print(f"✅ Datos cargados en tabla SQL: {table_name}")
-    except SQLAlchemyError as e:
-        print(f"❌ Error de conexión SQL: {e}")
+        df.write.mode("overwrite").parquet(hdfs_path)
+        print(f"Datos guardados en HDFS: {hdfs_path}")
     except Exception as e:
-        print(f"❌ Error inesperado en save_to_sql: {e}")
+        print(f"Error guardando en HDFS: {e}")
+
+def save_to_postgres(df, db_user, db_pass, db_host, db_port, db_name):
+    try:
+        errors = df.filter(
+            (col("age").isNull()) |
+            (col("pack_years").isNull()) |
+            (col("lung_cancer").isNull())
+        ).count()
+        if errors > 0:
+            raise ValueError(f"{errors} filas con errores, abortando carga SQL")
+
+        engine = create_engine(f"postgresql+psycopg2://{db_user}:{db_pass}@{db_host}:{db_port}/{db_name}")
+        df.toPandas().to_sql("lung_cancer", engine, if_exists="replace", index=False)
+        
+        print("Datos cargados en SQL: lung_cancer")
+    except Exception as e:
+        print(f"Error SQL: {e}")
